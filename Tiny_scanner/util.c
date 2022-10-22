@@ -18,10 +18,8 @@ void printToken( TokenType token, const char* tokenString )
     case ELSE: fprintf(listing,"%-20s%-20s\n","ELSE",tokenString); break;
     case RETURN: fprintf(listing,"%-20s%-20s\n","RETURN",tokenString); break;
     case WHILE: fprintf(listing,"%-20s%-20s\n","WHILE",tokenString); break;
-    case FOR: fprintf(listing,"%-20s%-20s\n","FOR",tokenString); break;
     case INT: fprintf(listing,"%-20s%-20s\n","INT",tokenString); break;
     case VOID: fprintf(listing,"%-20s%-20s\n","VOID",tokenString); break;
-    case CHAR: fprintf(listing,"%-20s%-20s\n","CHAR",tokenString); break;
     case ASSIGN: fprintf(listing,"%-20s%-20s\n","ASSIGN",tokenString); break;
     case LT: fprintf(listing,"%-20s%-20s\n","LT",tokenString); break;
     case LTE: fprintf(listing,"%-20s%-20s\n","LTE",tokenString); break;
@@ -36,7 +34,6 @@ void printToken( TokenType token, const char* tokenString )
     case LCURLY: fprintf(listing,"%-20s%-20s\n","LCURLY",tokenString); break;
     case RCURLY: fprintf(listing,"%-20s%-20s\n","RCURLY",tokenString); break;
     case SEMICOLON: fprintf(listing,"%-20s%-20s\n","SEMICOLON",tokenString); break;
-    case COLON: fprintf(listing,"%-20s%-20s\n","COLON",tokenString); break;
     case COMMA: fprintf(listing,"%-20s%-20s\n","COMMA",tokenString); break;
     case PLUS: fprintf(listing,"%-20s%-20s\n","PLUS",tokenString); break;
     case MINUS: fprintf(listing,"%-20s%-20s\n","MINUS",tokenString); break;

@@ -32,10 +32,8 @@ comment_end    "*/"
 "else"                      { return ELSE; }
 "return"                    { return RETURN; }
 "while"                     { return WHILE; }
-"for"                       { return FOR; }
 "int"                       { return INT; }
 "void"                      { return VOID; }
-"char"                      { return CHAR; }
 "="                         { return ASSIGN; }
 "=="                        { return EQ; }
 "!="                        { return NEQ; }
@@ -54,7 +52,6 @@ comment_end    "*/"
 "{"                         { return LCURLY; }
 "}"                         { return RCURLY; }
 ";"                         { return SEMICOLON; }
-":"                         { return COLON; }
 ","                         { return COMMA; }
         
 {number}                    { return NUM; }

@@ -4,8 +4,8 @@ LFLAGS = -ll
 
 CFLAGS = 
 
-hw1_20181605.exe : main.o util.o lex.yy.o
-	$(CC) $(CFLAGS) -g -o hw1_20181605.exe main.o util.o lex.yy.o $(LFLAGS)
+hw1_binary : main.o util.o lex.yy.o
+	$(CC) $(CFLAGS) -g -o hw1_binary main.o util.o lex.yy.o $(LFLAGS)
 
 util.o: util.c util.h globals.h
 	$(CC) $(CFLAGS) -c -o util.o util.c
@@ -26,4 +26,4 @@ lex.yy.o : lex.yy.c
 	clean
 
 clean:
-	rm *.o hw1_20181605.exe lex.yy.c hw1_20181605.txt
+	rm *.o hw1_binary lex.yy.c hw1_20181605.txt
