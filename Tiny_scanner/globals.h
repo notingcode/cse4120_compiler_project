@@ -29,11 +29,15 @@ typedef enum
     /* book-keeping tokens */
    {ENDFILE,ERROR,
     /* reserved words */
-    IF,THEN,ELSE,END,REPEAT,UNTIL,READ,WRITE,
+    IF,ELSE,RETURN,WHILE,FOR,
+    /* reserved words for data type*/
+    INT,VOID,CHAR,
     /* multicharacter tokens */
     ID,NUM,
     /* special symbols */
-    ASSIGN,EQ,LT,PLUS,MINUS,TIMES,OVER,LPAREN,RPAREN,SEMI
+    ASSIGN,EQ,NEQ,LT,LTE,GT,GTE,PLUS,MINUS,TIMES,OVER,
+    LPAREN,RPAREN,LSQUAREB,RSQUAREB,LCURLY,RCURLY,SEMICOLON,
+    COLON,COMMA,COMMENT,COMMENT_ERROR
    } TokenType;
 
 extern FILE* source; /* source code text file */

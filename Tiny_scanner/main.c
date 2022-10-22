@@ -7,8 +7,9 @@
 
 #include "globals.h"
 
+#define ONLY_LEXI TRUE
 /* set NO_PARSE to TRUE to get a scanner-only compiler */
-#define NO_PARSE FALSE
+#define NO_PARSE TRUE
 /* set NO_ANALYZE to TRUE to get a parser-only compiler */
 #define NO_ANALYZE FALSE
 
@@ -18,6 +19,7 @@
 #define NO_CODE FALSE
 
 #include "util.h"
+#if !ONLY_LEXI
 #if NO_PARSE
 #include "scan.h"
 #else
@@ -26,6 +28,7 @@
 #include "analyze.h"
 #if !NO_CODE
 #include "cgen.h"
+#endif
 #endif
 #endif
 #endif
@@ -38,7 +41,7 @@ FILE * code;
 
 /* allocate and set tracing flags */
 int EchoSource = FALSE;
-int TraceScan = FALSE;
+int TraceScan = TRUE;
 int TraceParse = FALSE;
 int TraceAnalyze = FALSE;
 int TraceCode = FALSE;
@@ -60,9 +63,18 @@ main( int argc, char * argv[] )
   { fprintf(stderr,"File %s not found\n",pgm);
     exit(1);
   }
-  listing = stdout; /* send listing to screen */
+  FILE *fp = fopen("hw1_20181605.txt","w");
+  listing = fp; /* send listing to screen */
   fprintf(listing,"\nTINY COMPILATION: %s\n",pgm);
 #if NO_PARSE
+  if(TraceScan)
+  {
+    int horizontal_divider_len = 60;
+    fprintf(listing, "\n%-20s%-20s%-20s\n", "line number", "token", "lexeme");
+    for(int i=0; i < horizontal_divider_len; i++)
+      fputc('=', listing);
+    fputc('\n', listing);
+  }
   while (getToken()!=ENDFILE);
 #else
   syntaxTree = parse();

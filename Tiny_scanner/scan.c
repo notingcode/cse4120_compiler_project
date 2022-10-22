@@ -11,7 +11,7 @@
 
 /* states in scanner DFA */
 typedef enum
-   { START,INASSIGN,INCOMMENT,INNUM,INID,DONE }
+   { START,INASSIGN,INCOMMENT,INNUM,INID,DONE,INCOMPARE }
    StateType;
 
 /* lexeme of identifier or reserved word */
@@ -56,9 +56,7 @@ static struct
     { char* str;
       TokenType tok;
     } reservedWords[MAXRESERVED]
-   = {{"if",IF},{"then",THEN},{"else",ELSE},{"end",END},
-      {"repeat",REPEAT},{"until",UNTIL},{"read",READ},
-      {"write",WRITE}};
+   = {{"if",IF},{"else",ELSE},{"return",RETURN},{"while",WHILE},{"for",FOR}};
 
 /* lookup an identifier to see if it is a reserved word */
 /* uses linear search */
@@ -96,6 +94,8 @@ TokenType getToken(void)
            state = INID;
          else if (c == ':')
            state = INASSIGN;
+         else if ((c == '<') || (c == '>'))
+           state = INCOMPARE;
          else if ((c == ' ') || (c == '\t') || (c == '\n'))
            save = FALSE;
          else if (c == '{')
@@ -122,7 +122,7 @@ TokenType getToken(void)
                currentToken = MINUS;
                break;
              case '*':
-               currentToken = TIMES;
+               currentToken = ASTER;
                break;
              case '/':
                currentToken = OVER;
@@ -134,7 +134,7 @@ TokenType getToken(void)
                currentToken = RPAREN;
                break;
              case ';':
-               currentToken = SEMI;
+               currentToken = SEMICOLON;
                break;
              default:
                currentToken = ERROR;
