@@ -1,0 +1,1 @@
+tiny.l should be in lex directory
