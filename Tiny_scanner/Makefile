@@ -26,4 +26,4 @@ lex.yy.o : lex.yy.c
 	clean
 
 clean:
-	rm *.o hw1_binary lex.yy.c hw1_20181605.txt
+	rm *.o hw1_binary lex.yy.c *_20181605.txt

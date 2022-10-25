@@ -51,20 +51,27 @@ int Error = FALSE;
 main( int argc, char * argv[] )
 { TreeNode * syntaxTree;
   char pgm[120]; /* source code file name */
+  char temp_tar[120];
+  char *target;
   if (argc != 2)
     { fprintf(stderr,"usage: %s <filename>\n",argv[0]);
       exit(1);
     }
-  strcpy(pgm,argv[1]) ;
+  strcpy(pgm,argv[1]);
   if (strchr (pgm, '.') == NULL)
      strcat(pgm,".tny");
+  strcpy(temp_tar,pgm);
   source = fopen(pgm,"r");
   if (source==NULL)
   { fprintf(stderr,"File %s not found\n",pgm);
     exit(1);
   }
-  FILE *fp = fopen("hw1_20181605.txt","w");
-  listing = fp; /* send listing to screen */
+  target = strtok(temp_tar, "[./]");
+  strcat(target,"_20181605.txt");
+  if((listing = fopen(target, "w")) == NULL){
+    fprintf(stderr,"Failed to open target txt file : %s %s\n", pgm, target);
+    exit(1);
+  }
   fprintf(listing,"\nTINY COMPILATION: %s\n",pgm);
 #if NO_PARSE
   if(TraceScan)
