@@ -66,7 +66,7 @@ main( int argc, char * argv[] )
   { fprintf(stderr,"File %s not found\n",pgm);
     exit(1);
   }
-  target = strtok(temp_tar, "[./]");
+  target = strtok(temp_tar, "./");
   strcat(target,"_20181605.txt");
   if((listing = fopen(target, "w")) == NULL){
     fprintf(stderr,"Failed to open target txt file : %s %s\n", pgm, target);
