@@ -65,7 +65,8 @@ comment_end    "*/"
 <C_COMMENT>{newline}        { lineno++; }
 <C_COMMENT><<EOF>>          { BEGIN(INITIAL);
                               return COMMENT_ERROR; }
-{comment_end}              { return COMMENT_ERROR; }
+{comment_end}               { return COMMENT_ERROR; }
+[ \t\r\n]                   {;}
 <<EOF>>                     { return ENDFILE; }
 
 %%

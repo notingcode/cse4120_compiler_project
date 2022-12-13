@@ -5,7 +5,7 @@ void main(void)
 	int c;
 	int d;
 	int e;
-	/*this is test*/
+
 	if(a != 1)
 		if(b != 2)
 			if(c != 3)

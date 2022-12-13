@@ -57,13 +57,11 @@ declaration : var-declaration { $$ = $1; }
 var-declaration : type-specifier identifier SEMICOLON
                   { $$ = newDeclNode(VarK);
                     $$->attr.name = savedName;
-                    $$->lineno = lineno;
                     $$->child[0] = $1;
                   }
-            | type-specifier identifier 
+            | type-specifier identifier
                   { $$ = newDeclNode(ArrVarK);
                     $$->attr.arrAttr.name = savedName;
-                    $$->lineno = lineno;
                     $$->child[0] = $1;
                   }
               LSQUAREB NUM 
@@ -86,7 +84,6 @@ type-specifier : INT
 
 fun-declaration : type-specifier identifier
                   { $$ = newDeclNode(FuncK);
-                    $$->lineno = lineno;
                     $$->attr.name = savedName;
                   }
                     LPAREN params RPAREN compound-stmt
@@ -97,11 +94,11 @@ fun-declaration : type-specifier identifier
                   }
             ;
 
-params      : paramList { $$ = $1; }
+params      : param-list { $$ = $1; }
             | VOID { $$ = NULL; }
             ;
 
-paramList   : paramList COMMA param
+param-list   : param-list COMMA param
                  { YYSTYPE t = $1;
                    if (t != NULL)
                    { while (t->sibling != NULL)
@@ -197,7 +194,6 @@ return-stmt : RETURN SEMICOLON
 
 expression  : var ASSIGN expression
                 { $$ = newExpNode(AssignK);
-                  $$->attr.name = savedName;
                   $$->child[0] = $1;
                   $$->child[1] = $3;
                 }
@@ -303,7 +299,6 @@ factor      : LPAREN expression RPAREN
             | NUM
                   { $$ = newExpNode(ConstK);
                     $$->attr.val = atoi(tokenString);
-                    $$->lineno = lineno;
                   }
             ;
 
@@ -311,7 +306,7 @@ call        : identifier
                 { $$ = newExpNode(CallK);
                   $$->attr.name = savedName;
                 }
-              LCURLY args RCURLY
+              LPAREN args RPAREN
                 { $$ = $2;
                   $$->child[0] = $4;
                 }
