@@ -19,25 +19,25 @@ Syntax tree:
                 Simple Expression
                     Variable : a
                     Operator : !=
-                    Constant : 0
+                    Constant : 1
                 If
                     Simple Expression
                         Variable : b
                         Operator : !=
-                        Constant : 0
+                        Constant : 2
                     If
                         Simple Expression
                             Variable : c
                             Operator : !=
-                            Constant : 0
-                        Else
+                            Constant : 3
+                        If
                             Simple Expression
                                 Variable : d
                                 Operator : ==
-                                Constant : 0
+                                Constant : 4
                             Assign : =
                                 Variable : e
-                                Constant : 0
+                                Constant : 5
                             Assign : =
                                 Variable : e
-                                Constant : 0
+                                Constant : 4

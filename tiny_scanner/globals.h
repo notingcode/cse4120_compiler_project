@@ -1,6 +1,5 @@
 /****************************************************/
 /* File: globals.h                                  */
-/* Yacc/Bison Version                               */
 /* Global types and vars for TINY compiler          */
 /* must come before other include files             */
 /* Compiler Construction: Principles and Practice   */
@@ -15,27 +14,6 @@
 #include <ctype.h>
 #include <string.h>
 
-/* Yacc/Bison generates internally its own values
- * for the tokens. Other files can access these values
- * by including the tab.h file generated using the
- * Yacc/Bison option -d ("generate header")
- *
- * The YYPARSER flag prevents inclusion of the tab.h
- * into the Yacc/Bison output itself
- */
-
-#ifndef YYPARSER
-
-/* the name of the following file may change */
-#include "y.tab.h"
-
-/* ENDFILE is implicitly defined by Yacc/Bison,
- * and not included in the tab.h file
- */
-#define ENDFILE 0
-
-#endif
-
 #ifndef FALSE
 #define FALSE 0
 #endif
@@ -44,17 +22,65 @@
 #define TRUE 1
 #endif
 
+#ifndef YYPARSER
+
+/* the name of the following file may change */
+#include "cm.tab.h"
+
+/* ENDFILE is implicitly defined by Yacc/Bison,
+ * and not included in the tab.h file
+ */
+#define ENDFILE 0
+#endif
+
 /* MAXRESERVED = the number of reserved words */
 #define MAXRESERVED 8
 
-/* Yacc/Bison generates its own integer values
- * for tokens
- */
-typedef int TokenType; 
+typedef int TokenType;
 
-extern FILE* source; /* source code text file */
-extern FILE* listing; /* listing output text file */
-extern FILE* code; /* code text file for TM simulator */
+// typedef enum
+// /* book-keeping tokens */
+// {
+//    ENDFILE,
+//    ERROR,
+//    /* reserved words */
+//    IF,
+//    ELSE,
+//    RETURN,
+//    WHILE,
+//    /* reserved words for data type*/
+//    INT,
+//    VOID,
+//    /* multicharacter tokens */
+//    ID,
+//    NUM,
+//    /* special symbols */
+//    ASSIGN,
+//    EQ,
+//    NEQ,
+//    LT,
+//    LTE,
+//    GT,
+//    GTE,
+//    PLUS,
+//    MINUS,
+//    TIMES,
+//    OVER,
+//    LPAREN,
+//    RPAREN,
+//    LSQUAREB,
+//    RSQUAREB,
+//    LCURLY,
+//    RCURLY,
+//    SEMICOLON,
+//    COMMA,
+//    COMMENT,
+//    COMMENT_ERROR
+// } TokenType;
+
+extern FILE *source;  /* source code text file */
+extern FILE *listing; /* listing output text file */
+extern FILE *code;    /* code text file for TM simulator */
 
 extern int lineno; /* source line number for listing */
 
@@ -62,26 +88,80 @@ extern int lineno; /* source line number for listing */
 /***********   Syntax tree for parsing ************/
 /**************************************************/
 
-typedef enum {StmtK,ExpK} NodeKind;
-typedef enum {IfK,RepeatK,AssignK,ReadK,WriteK} StmtKind;
-typedef enum {OpK,ConstK,IdK} ExpKind;
+typedef enum
+{
+   StmtK,
+   ExpK,
+   DeclK,
+   ParamK,
+   TypeK
+} NodeKind;
+typedef enum
+{
+   IfK,
+   LoopK,
+   RetK,
+   CompK
+} StmtKind;
+typedef enum
+{
+   OpK,
+   AssignK,
+   ConstK,
+   IdK,
+   ArrIdK,
+   CallK,
+   SimpleK
+} ExpKind;
+typedef enum
+{
+   FuncK,
+   VarK,
+   ArrVarK
+} DeclKind;
+typedef enum
+{
+   TypeNameK
+} TypeKind;
 
 /* ExpType is used for type checking */
-typedef enum {Void,Integer,Boolean} ExpType;
+typedef enum
+{
+   Void,
+   Integer
+} ExpType;
 
 #define MAXCHILDREN 3
 
+struct arrayAttr
+{
+   char *name;
+   int size;
+};
+
 typedef struct treeNode
-   { struct treeNode * child[MAXCHILDREN];
-     struct treeNode * sibling;
-     int lineno;
-     NodeKind nodekind;
-     union { StmtKind stmt; ExpKind exp;} kind;
-     union { TokenType op;
-             int val;
-             char * name; } attr;
-     ExpType type; /* for type checking of exps */
-   } TreeNode;
+{
+   struct treeNode *child[MAXCHILDREN];
+   struct treeNode *sibling;
+   int lineno;
+   NodeKind nodekind;
+   union
+   {
+      StmtKind stmt;
+      ExpKind exp;
+      DeclKind decl;
+      TypeKind type;
+   } kind;
+   union
+   {
+      TokenType type;
+      TokenType op;
+      int val;
+      char *name;
+      struct arrayAttr arrAttr;
+   } attr;
+   ExpType type; /* for type checking of exps */
+} TreeNode;
 
 /**************************************************/
 /***********   Flags for tracing       ************/
@@ -116,5 +196,5 @@ extern int TraceAnalyze;
 extern int TraceCode;
 
 /* Error = TRUE prevents further passes if an error occurs */
-extern int Error; 
+extern int Error;
 #endif
