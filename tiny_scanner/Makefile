@@ -14,7 +14,7 @@ main.o: main.c globals.h util.h scan.h cm.tab.h
 	$(CC) $(CFLAGS) -c -o main.o main.c
 
 lex.yy.c : lex/tiny.l
-	lex --noyywrap lex/tiny.l
+	lex lex/tiny.l
 
 lex.yy.o : lex.yy.c util.h globals.h scan.h
 	$(CC) -c -o lex.yy.o lex.yy.c
@@ -29,4 +29,4 @@ cm.tab.o : cm.tab.c cm.tab.h
 	clean
 
 clean:
-	rm *.o hw1_binary lex.yy.c *_20181605.txt cm.*
+	rm *.o hw1_binary lex.yy.c cm.tab.c *_20181605.txt

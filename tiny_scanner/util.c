@@ -183,7 +183,7 @@ char * copyString(char * s)
   t = malloc(n);
   if (t==NULL)
     fprintf(listing,"Out of memory error at line %d\n",lineno);
-  else strncpy(t,s,n);
+  else strcpy(t,s);
   return t;
 }
 

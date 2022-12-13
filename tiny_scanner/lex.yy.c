@@ -322,9 +322,6 @@ void yyfree ( void *  );
 #define YY_AT_BOL() (YY_CURRENT_BUFFER_LVALUE->yy_at_bol)
 
 /* Begin user sect3 */
-
-#define yywrap() (/*CONSTCOND*/1)
-#define YY_SKIP_YYWRAP
 typedef flex_uint8_t YY_CHAR;
 
 FILE *yyin = NULL, *yyout = NULL;
@@ -501,9 +498,9 @@ char *yytext;
 #include "scan.h"
 /* lexeme of identifier or reserved word */
 char tokenString[MAXTOKENLEN+1];
-#line 505 "lex.yy.c"
+#line 502 "lex.yy.c"
 
-#line 507 "lex.yy.c"
+#line 504 "lex.yy.c"
 
 #define INITIAL 0
 #define C_COMMENT 1
@@ -724,7 +721,7 @@ YY_DECL
 #line 27 "lex/tiny.l"
 
 
-#line 728 "lex.yy.c"
+#line 725 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -972,7 +969,7 @@ YY_RULE_SETUP
 #line 71 "lex/tiny.l"
 ECHO;
 	YY_BREAK
-#line 976 "lex.yy.c"
+#line 973 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{

@@ -28,18 +28,17 @@ static int yylex(void);
 %token LPAREN LSQUAREB LCURLY RPAREN RSQUAREB RCURLY SEMICOLON COMMA
 %token ERROR C_COMMENT COMMENT_ERROR ENDFILE
 
-/* %nonassoc RPAREN 
-%nonassoc ELSE */
+%right RPAREN ELSE
 
 %start program
 
 %% /* Grammar for C- lang */
 
-program     : declList
+program     : declaration-list
                  { savedTree = $1;} 
             ;
 
-declList    : declList declaration
+declaration-list    : declaration-list declaration
                  { YYSTYPE t = $1;
                    if (t != NULL)
                    { while (t->sibling != NULL)
@@ -51,17 +50,17 @@ declList    : declList declaration
             | declaration { $$ = $1; }
             ;
 
-declaration : variableDeclaration { $$ = $1; }
-            | functionDeclaration { $$ = $1; }
+declaration : var-declaration { $$ = $1; }
+            | fun-declaration { $$ = $1; }
             ;
 
-variableDeclaration : typeSpecifier identifier SEMICOLON
+var-declaration : type-specifier identifier SEMICOLON
                   { $$ = newDeclNode(VarK);
                     $$->attr.name = savedName;
                     $$->lineno = lineno;
                     $$->child[0] = $1;
                   }
-            | typeSpecifier identifier 
+            | type-specifier identifier 
                   { $$ = newDeclNode(ArrVarK);
                     $$->attr.arrAttr.name = savedName;
                     $$->lineno = lineno;
@@ -75,94 +74,7 @@ variableDeclaration : typeSpecifier identifier SEMICOLON
                   { $$ = $6; }
             ;
 
-functionDeclaration : typeSpecifier identifier
-                  { $$ = newDeclNode(FuncK);
-                    $$->attr.name = savedName;
-                    $$->lineno = lineno;
-                  }
-                    LPAREN params RPAREN compoundStmt
-                  { $$ = $3;
-                    $$->child[0] = $1;
-                    $$->child[1] = $5;
-                    $$->child[2] = $7;
-                  }
-            ;
-
-localDecl : localDecl variableDeclaration
-                 { YYSTYPE t = $1;
-                   if (t != NULL)
-                   { while (t->sibling != NULL)
-                        t = t->sibling;
-                     t->sibling = $2;
-                     $$ = $1; }
-                     else $$ = $2;
-                 }
-            | empty { $$ = $1; }
-            ;
-
-stmtSeq    : stmtSeq stmt
-                 { YYSTYPE t = $1;
-                   if (t != NULL)
-                   { while (t->sibling != NULL)
-                        t = t->sibling;
-                     t->sibling = $2;
-                     $$ = $1; }
-                     else $$ = $2;
-                 }
-            | empty { $$ = $1; }
-            ;
-
-stmt        : expressionStmt { $$ = $1; }
-            | compoundStmt { $$ = $1; }
-            | ifStmt { $$ = $1; }
-            | loopStmt { $$ = $1; }
-            | returnStmt { $$ = $1; }
-            ;
-
-expressionStmt : exp SEMICOLON
-                  { $$ = $1; }
-            | SEMICOLON { $$ = NULL; }
-            ;
-
-compoundStmt : LCURLY localDecl stmtSeq RCURLY
-                  { $$ = newStmtNode(CompK);
-                    $$->child[0] = $2;
-                    $$->child[1] = $3;
-                  }
-            ;
-
-ifStmt     : IF LPAREN exp RPAREN stmt
-                  { $$ = newStmtNode(IfK);
-                    $$->child[0] = $3;
-                    $$->child[1] = $5;
-                  }
-            | IF LPAREN exp RPAREN stmt ELSE stmt
-                  { $$ = newStmtNode(IfK);
-                    $$->child[0] = $3;
-                    $$->child[1] = $5;
-                    $$->child[2] = $7;
-                  }
-            ;
-
-loopStmt : WHILE LPAREN exp RPAREN stmtSeq
-                 { $$ = newStmtNode(LoopK);
-                   $$->child[0] = $3;
-                   $$->child[1] = $5;
-                 }
-            ;
-
-returnStmt : RETURN SEMICOLON
-                { $$ = newStmtNode(RetK); }
-            | RETURN exp SEMICOLON
-                { $$ = newStmtNode(RetK);
-                  $$->child[0] = $2;
-                }
-
-identifier  : ID
-                  { savedName = copyString(tokenString); }
-            ;
-
-typeSpecifier : INT
+type-specifier : INT
                   { $$ = newTypeNode(TypeNameK);
                     $$->attr.type = INT;
                   }
@@ -172,11 +84,21 @@ typeSpecifier : INT
                   } 
             ;
 
-params      : paramList { $$ = $1; }
-            | VOID
-                  { $$ = newTypeNode(TypeNameK);
-                    $$->attr.type = VOID;
+fun-declaration : type-specifier identifier
+                  { $$ = newDeclNode(FuncK);
+                    $$->lineno = lineno;
+                    $$->attr.name = savedName;
                   }
+                    LPAREN params RPAREN compound-stmt
+                  { $$ = $3;
+                    $$->child[0] = $1;
+                    $$->child[1] = $5;
+                    $$->child[2] = $7;
+                  }
+            ;
+
+params      : paramList { $$ = $1; }
+            | VOID { $$ = NULL; }
             ;
 
 paramList   : paramList COMMA param
@@ -191,19 +113,98 @@ paramList   : paramList COMMA param
             | param { $$ = $1; }
             ;
 
-param       : typeSpecifier identifier
+param       : type-specifier identifier
                   { $$ = newDeclNode(VarK);
                     $$->attr.name = savedName;
                     $$->child[0] = $1;
                   }
-            | typeSpecifier identifier LSQUAREB RSQUAREB
+            | type-specifier identifier LSQUAREB RSQUAREB
                   { $$ = newDeclNode(ArrVarK);
                     $$->attr.arrAttr.name = savedName;
                     $$->attr.arrAttr.size = -1;
                   }
             ;
 
-variable    : identifier
+compound-stmt : LCURLY local-declarations statement-list RCURLY
+                  { $$ = newStmtNode(CompK);
+                    $$->child[0] = $2;
+                    $$->child[1] = $3;
+                  }
+            ;
+
+local-declarations : local-declarations var-declaration
+                 { YYSTYPE t = $1;
+                   if (t != NULL)
+                   { while (t->sibling != NULL)
+                        t = t->sibling;
+                     t->sibling = $2;
+                     $$ = $1; }
+                     else $$ = $2;
+                 }
+            | empty { $$ = $1; }
+            ;
+
+statement-list    : statement-list statement
+                 { YYSTYPE t = $1;
+                   if (t != NULL)
+                   { while (t->sibling != NULL)
+                        t = t->sibling;
+                     t->sibling = $2;
+                     $$ = $1; }
+                     else $$ = $2;
+                 }
+            | empty { $$ = $1; }
+            ;
+
+statement   : expression-stmt { $$ = $1; }
+            | compound-stmt { $$ = $1; }
+            | selection-stmt { $$ = $1; }
+            | iteration-stmt { $$ = $1; }
+            | return-stmt { $$ = $1; }
+            ;
+
+expression-stmt : expression SEMICOLON
+                  { $$ = $1; }
+            | SEMICOLON { $$ = NULL; }
+            ;
+
+selection-stmt     : IF LPAREN expression RPAREN statement
+                  { $$ = newStmtNode(IfK);
+                    $$->child[0] = $3;
+                    $$->child[1] = $5;
+                  }
+            | IF LPAREN expression RPAREN statement ELSE statement
+                  { $$ = newStmtNode(IfK);
+                    $$->child[0] = $3;
+                    $$->child[1] = $5;
+                    $$->child[2] = $7;
+                  }
+            ;
+
+iteration-stmt : WHILE LPAREN expression RPAREN statement-list
+                 { $$ = newStmtNode(LoopK);
+                   $$->child[0] = $3;
+                   $$->child[1] = $5;
+                 }
+            ;
+
+return-stmt : RETURN SEMICOLON
+                { $$ = newStmtNode(RetK); }
+            | RETURN expression SEMICOLON
+                { $$ = newStmtNode(RetK);
+                  $$->child[0] = $2;
+                }
+
+expression  : var ASSIGN expression
+                { $$ = newExpNode(AssignK);
+                  $$->attr.name = savedName;
+                  $$->child[0] = $1;
+                  $$->child[1] = $3;
+                }
+            | simple-expression { $$ = $1; }
+            ;
+
+var    : identifier
                 { $$ = newExpNode(IdK);
                   $$->attr.name = savedName;
                 }
@@ -211,35 +212,31 @@ variable    : identifier
                 { $$ = newExpNode(ArrIdK);
                   $$->attr.name = savedName;
                 }
-              LSQUAREB exp RSQUAREB
+              LSQUAREB expression RSQUAREB
                 { $$ = $2;
                   $$->child[0] = $4; 
                 }
             ;
-exp         : variable ASSIGN exp
-                { $$ = newExpNode(AssignK);
-                  $$->attr.name = savedName;
-                  $$->child[0] = $1;
-                  $$->child[1] = $3;
-                }
-            | simpleExp { $$ = $1; }
+
+identifier  : ID
+                  { savedName = copyString(tokenString); }
             ;
 
-simpleExp  : addExp relop addExp
+simple-expression  : additive-expression relop additive-expression
                  { $$ = $2;
                    $$->child[0] = $1;
                    $$->child[1] = $3;
                  }
-            | addExp { $$ = $1; }
+            | additive-expression { $$ = $1; }
             ;
 
-relop       : LT
-                { $$ = newExpNode(OpK);
-                  $$->attr.op = LT;
-                }
-            | LTE
+relop       : LTE
                 { $$ = newExpNode(OpK);
                   $$->attr.op = LTE;
+                }
+            | LT
+                { $$ = newExpNode(OpK);
+                  $$->attr.op = LT;
                 }
             | GT
                 {
@@ -260,34 +257,13 @@ relop       : LT
                 }
             ;
 
-addExp      : addExp addop term
-                { $$ = $2;
-                  $$->child[0] = $1;
-                  $$->child[1] = $3;
-                }
-            | term { $$ = $1; }
-            ;
-
-term        : term mulop factor 
-                 { $$ = $2;
-                   $$->child[0] = $1;
-                   $$->child[1] = $3;
-                 }
-            | factor { $$ = $1; }
-            ;
-
-factor      : LPAREN exp RPAREN
-                  { $$ = $2; }
-            | variable
-                  { $$ = $1; }
-            | call
-                  { $$ = $1; }
-            | NUM
-                  { $$ = newExpNode(ConstK);
-                    $$->attr.val = atoi(tokenString);
-                    $$->lineno = lineno;
-                  }
-            ;
+additive-expression : additive-expression addop term
+                        { $$ = $2;
+                          $$->child[0] = $1;
+                          $$->child[1] = $3;
+                        }
+                    | term { $$ = $1; }
+                    ;
 
 addop       : PLUS
                 { $$ = newExpNode(OpK);
@@ -297,6 +273,14 @@ addop       : PLUS
                 { $$ = newExpNode(OpK);
                   $$->attr.op = MINUS;
                 }
+            ;
+
+term        : term mulop factor 
+                 { $$ = $2;
+                   $$->child[0] = $1;
+                   $$->child[1] = $3;
+                 }
+            | factor { $$ = $1; }
             ;
 
 mulop       : TIMES
@@ -310,6 +294,19 @@ mulop       : TIMES
                 }
             ;
 
+factor      : LPAREN expression RPAREN
+                  { $$ = $2; }
+            | var
+                  { $$ = $1; }
+            | call
+                  { $$ = $1; }
+            | NUM
+                  { $$ = newExpNode(ConstK);
+                    $$->attr.val = atoi(tokenString);
+                    $$->lineno = lineno;
+                  }
+            ;
+
 call        : identifier
                 { $$ = newExpNode(CallK);
                   $$->attr.name = savedName;
@@ -320,11 +317,11 @@ call        : identifier
                 }
             ;
 
-args        : argSeq { $$ = $1; }
+args        : arg-list { $$ = $1; }
             | empty { $$ = $1; }
             ;
 
-argSeq      : argSeq COMMA exp
+arg-list      : arg-list COMMA expression
                  { YYSTYPE t = $1;
                    if (t != NULL)
                    { while (t->sibling != NULL)
@@ -333,7 +330,7 @@ argSeq      : argSeq COMMA exp
                      $$ = $1; }
                      else $$ = $3;
                  }
-            | exp { $$ = $1; }
+            | expression { $$ = $1; }
             ;
 
 empty       : { $$ = NULL; }
