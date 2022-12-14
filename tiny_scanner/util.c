@@ -233,8 +233,22 @@ void printTree( TreeNode * tree )
     else if (tree->nodekind==ExpK)
     { switch (tree->kind.exp) {
         case OpK:
-          fprintf(listing,"Simple Expression\n");
-          printSpaces();
+          switch(tree->attr.op) {
+            case PLUS:
+            case MINUS:
+              fprintf(listing,"Additive Expression\n");
+              printSpaces();
+              break;
+            case TIMES:
+            case OVER:
+              fprintf(listing,"Multiplicative Expression\n");
+              printSpaces();
+              break;
+            default:
+              fprintf(listing,"Simple Expression\n");
+              printSpaces();
+              break;
+          }
           fprintf(listing,"  Operator : ");
           printOpToken(tree->attr.op);
           break;
@@ -271,6 +285,12 @@ void printTree( TreeNode * tree )
             fprintf(listing,"Array Variable Declare : %s\n",tree->attr.arrAttr.name);
           else
             fprintf(listing,"Array Variable Allocate : %s of size %d\n",tree->attr.arrAttr.name,tree->attr.arrAttr.size);
+          break;
+        case ParamK:
+          fprintf(listing,"Param : %s\n",tree->attr.name);
+          break;
+        case ArrParamK:
+          fprintf(listing,"Array Param : %s\n",tree->attr.name);
           break;
         default:
           fprintf(listing,"Unknown Declaration Node Kind\n");

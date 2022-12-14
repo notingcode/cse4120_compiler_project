@@ -8,6 +8,9 @@
 
 #ifndef _GLOBALS_H_
 #define _GLOBALS_H_
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -93,7 +96,6 @@ typedef enum
    StmtK,
    ExpK,
    DeclK,
-   ParamK,
    TypeK
 } NodeKind;
 typedef enum
@@ -117,7 +119,9 @@ typedef enum
 {
    FuncK,
    VarK,
-   ArrVarK
+   ArrVarK,
+   ParamK,
+   ArrParamK
 } DeclKind;
 typedef enum
 {

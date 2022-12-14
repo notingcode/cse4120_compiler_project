@@ -111,14 +111,15 @@ param-list   : param-list COMMA param
             ;
 
 param       : type-specifier identifier
-                  { $$ = newDeclNode(VarK);
+                  { $$ = newDeclNode(ParamK);
                     $$->attr.name = savedName;
                     $$->child[0] = $1;
                   }
             | type-specifier identifier LSQUAREB RSQUAREB
-                  { $$ = newDeclNode(ArrVarK);
+                  { $$ = newDeclNode(ArrParamK);
                     $$->attr.arrAttr.name = savedName;
                     $$->attr.arrAttr.size = -1;
+                    $$->child[0] = $1;
                   }
             ;
 
